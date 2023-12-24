@@ -1,7 +1,15 @@
 import { NavLink } from "react-router-dom";
 import "./Header.css";
+import { useAuthState } from "react-firebase-hooks/auth";
+import auth from "../../config/Firebase";
+import { signOut } from "firebase/auth";
 
 const Header = () => {
+  const [user] = useAuthState(auth);
+
+  const logout = () => {
+    signOut(auth);
+  };
   return (
     <nav className="navbar">
       <NavLink
@@ -28,9 +36,18 @@ const Header = () => {
       >
         Users
       </NavLink>
-      <NavLink className="links" to="/login">
-        <button className="nav-login-btn">Log In</button>
-      </NavLink>
+      {user ? (
+        <NavLink className="links" to="/login">
+          <button onClick={logout} className="nav-login-btn">
+            Log out
+          </button>
+        </NavLink>
+      ) : (
+        <NavLink className="links" to="/login">
+          <button className="nav-login-btn">Log In</button>
+        </NavLink>
+      )}
+      <span>{user?.displayName}</span>
     </nav>
   );
 };

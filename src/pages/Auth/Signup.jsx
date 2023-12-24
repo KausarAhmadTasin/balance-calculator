@@ -1,6 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
+import {
+  useCreateUserWithEmailAndPassword,
+  useUpdateProfile,
+} from "react-firebase-hooks/auth";
 import { toast } from "react-toastify";
 import auth from "../../config/Firebase";
 
@@ -13,20 +16,30 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
+import Loading from "../../components/Loading/Loading";
 const Signup = () => {
   const navigate = useNavigate();
   const [createUserWithEmailAndPassword, user, loading, error] =
-    useCreateUserWithEmailAndPassword(auth);
-
+    useCreateUserWithEmailAndPassword(auth, {
+      sendEmailVerification: true,
+    });
+  const [updateProfile, updating] = useUpdateProfile(auth);
   const backClick = () => {
     navigate(-1);
   };
 
+  const [] = useUpdateProfile(auth);
+
+  if (loading || updating) {
+    return <Loading />;
+  }
+
   const googleProvider = new GoogleAuthProvider();
   const gitubProvider = new GithubAuthProvider();
 
-  const signupSubmit = (e) => {
+  const signupSubmit = async (e) => {
     e.preventDefault();
     const name = e.target.name.value;
     const email = e.target.email.value;
@@ -39,7 +52,7 @@ const Signup = () => {
       return toast.error("Password does not match!");
     } else {
       createUserWithEmailAndPassword(email, password);
-      console.log(user);
+      await updateProfile({ displayName: name });
       return toast.success("Sign Up Successfully");
     }
   };
@@ -52,7 +65,7 @@ const Signup = () => {
         const token = credential.accessToken;
         // The signed-in user info.
         const user = result.user;
-        alert("Loged in wit google successfully!");
+        alert("Loged in with google successfully!");
         navigate("/");
       })
       .catch((error) => {
@@ -66,6 +79,15 @@ const Signup = () => {
         // ...
       });
   };
+
+  let errorElement;
+  if (error) {
+    errorElement = <p className="text-red-600">{error?.message}</p>;
+  }
+
+  if (user) {
+    navigate("/");
+  }
 
   const githubLogIn = () => {
     signInWithPopup(auth, gitubProvider)

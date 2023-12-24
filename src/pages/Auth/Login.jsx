@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   getAuth,
   // signInWithEmailAndPassword,
@@ -16,6 +16,7 @@ import auth from "../../config/Firebase";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const location = useLocation();
 
   const googleProvider = new GoogleAuthProvider();
   const gitubProvider = new GithubAuthProvider();

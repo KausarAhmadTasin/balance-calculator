@@ -29,7 +29,11 @@ const routes = createBrowserRouter([
       },
       {
         path: "/users",
-        element: <Users />,
+        element: (
+          <privateRoutes>
+            <Users />
+          </privateRoutes>
+        ),
         loader: () => fetch(`https://jsonplaceholder.typicode.com/users`),
         errorElement: <NotFound />,
       },
